@@ -33,3 +33,7 @@ $('format').onchange=()=>{updateOptions();refreshConversions();};$('quality').on
 
 function updateResize(){const enabled=$('resize').checked;for(const id of ['max-width','max-height'])$(id).disabled=!enabled;$('size-note').textContent=enabled?'Aspect ratio locked · fits within your limits · no stretching, cropping, or enlargement.':'Original width, height, and aspect ratio are preserved.';}
 $('resize').onchange=()=>{updateResize();refreshConversions();};updateResize();
+
+// Whole drop zone opens the picker; paste (⌘V / Ctrl+V) adds clipboard images.
+$('drop').addEventListener('click',e=>{if(!e.target.closest('button')&&!$('browse').disabled)$('files').click();});$('drop').addEventListener('keydown',e=>{if(e.target===$('drop')&&(e.key==='Enter'||e.key===' ')){e.preventDefault();$('files').click();}});
+window.addEventListener('paste',e=>{if(e.target.closest&&e.target.closest('input,select,textarea'))return;const files=[...(e.clipboardData?.files||[])].filter(f=>f.type.startsWith('image/')).map((f,i)=>/\.(png|jpe?g|webp|bmp|gif)$/i.test(f.name)?f:new File([f],`pasted-${Date.now()}-${i}.${(f.type.split('/')[1]||'png').replace('jpeg','jpg')}`,{type:f.type}));if(files.length){e.preventDefault();add(files);}});

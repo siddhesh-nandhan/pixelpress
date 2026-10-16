@@ -1,11 +1,115 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Private, on-device lossless PNG compression. No uploads, no accounts."><title>Pixelpress — Less weight. Every pixel.</title><link rel="stylesheet" href="style.css"></head><body>
-<header><a class="brand" href="./"><span class="logo">▧</span> pixelpress<span class="beta">LOCAL</span></a><a href="#how">How it works ↗</a></header>
-<main><section class="hero"><div class="eyebrow"><span class="dot"></span> SMALLER FILES. ZERO UPLOADS.</div><h1>Less weight.<br><span>Every pixel.</span></h1><p>Give your images a lighter footprint.<br>Compress or convert, right in your browser.</p><div class="badges"><span>✓ Lossless options</span><span>⌁ On-device processing</span><span>∞ Free to use</span></div></section>
-<section class="workspace" aria-label="Image compressor"><div class="workspace-top"><span><span class="dot"></span> Your private compression studio</span><span class="muted">01 / COMPRESS</span></div>
-<div class="drop" id="drop"><div class="upload-icon">↥</div><h2>Drop your images here</h2><p>or choose a few. We’ll take care of the bytes.</p><button id="browse" class="primary">Choose images <span>＋</span></button><input hidden id="files" type="file" multiple accept="image/png,image/jpeg,image/webp,image/bmp,image/gif,.png,.jpg,.jpeg,.webp,.bmp,.gif"><small>PNG, JPEG, WebP, BMP & GIF input · 30 MB per file</small></div>
-<div class="options"><label>Output <select id="format"><option value="original">Original format</option><option value="webp">PNG → WebP · lossless</option><option value="png">Convert to PNG</option><option value="jpeg">Convert to JPEG · lossy</option><option value="webp-lossy">Convert to WebP · lossy</option></select></label><label>Compression effort <select id="effort"><option value="balanced">Balanced</option><option value="maximum">Maximum · slower</option></select></label><label class="check"><input id="comments" type="checkbox"> Remove JPEG comments <span title="Only JPEG COM segments are removed. EXIF, orientation, GPS and color profiles are preserved.">ⓘ</span></label></div>
-<div id="convert-options" class="convert-options" hidden><label>Quality <input id="quality" type="range" min="1" max="100" value="85"> <output id="quality-value">85%</output></label><label class="check"><input id="resize" type="checkbox"> Resize image (optional)</label><label>Max width <input id="max-width" type="number" min="1" max="16383" placeholder="Original"></label><label>Max height <input id="max-height" type="number" min="1" max="16383" placeholder="Original"></label><label id="background-label">JPEG background <input type="color" id="background" value="#ffffff"></label><label class="check"><input id="first-frame" type="checkbox"> Use first frame for GIF / animated images</label><small id="size-note">Original width, height, and aspect ratio are preserved.</small><small>Changing settings automatically refreshes all loaded images.</small></div><p class="conversion-note" id="conversion-note" hidden>PNG → WebP: pixels and transparency are verified lossless. Metadata is not copied. Some files may be larger. 16-bit, animated, interlaced, and custom-profile PNGs are not supported.</p><div id="notice" role="status" aria-live="polite"></div>
-<section id="results" hidden><div class="results-heading"><h2>Your images <span id="count"></span></h2><button id="clear" class="text-button">Clear finished</button></div><div id="list"></div><div class="summary"><div><strong id="saved">0 B saved</strong><small id="total">Everything stays on this device.</small></div><button id="download" class="primary" disabled>Download all ↓</button></div></section>
-</section>
-<section class="details" id="how"><article><span>01 / PRIVATE BY DESIGN</span><h3>Your files stay yours.</h3><p>No server uploads, accounts, trackers, or external scripts. The compression happens on your device.</p></article><article><span>02 / ACTUALLY LOSSLESS</span><h3>Same image. Fewer bytes.</h3><p>Original-format compression preserves PNG pixels and metadata. Lossless PNG → WebP preserves pixels and transparency.</p></article><article><span>03 / HONEST RESULTS</span><h3>No magic percentages.</h3><p>Savings vary. JPEG cleanup only removes optional comments. Conversion may increase size. Animation exports require first-frame consent.</p></article></section>
-<footer><a class="brand" href="./">▧ pixelpress</a><span>Made for the pixels worth keeping.</span><span>Local first. Always.</span></footer></main><script type="module" src="app.js"></script></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Pixelpress — Compress images privately</title>
+<meta name="description" content="Private, on-device image compression and conversion for PNG, JPEG, WebP, BMP and GIF. No uploads, no accounts.">
+<meta name="theme-color" content="#f7f4ed" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#151514" media="(prefers-color-scheme: dark)">
+<meta property="og:title" content="Pixelpress — Compress images privately">
+<meta property="og:description" content="Compress or convert images right in your browser. Nothing leaves your device.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23ff8a3d'/%3E%3Cstop offset='.55' stop-color='%23ff4f8b'/%3E%3Cstop offset='1' stop-color='%236b7bff'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='32' height='32' rx='9' fill='url(%23g)'/%3E%3Crect x='9' y='9' width='14' height='14' rx='3' fill='%23fcfbf8'/%3E%3C/svg%3E">
+<script>try{var t=localStorage.getItem('pp-theme');if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"Pixelpress","applicationCategory":"MultimediaApplication","operatingSystem":"Any","offers":{"@type":"Offer","price":"0"},"description":"Private, on-device image compression and conversion."}</script>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<a class="skip" href="#studio">Skip to the compressor</a>
+
+<header class="nav">
+  <a class="brand" href="./" aria-label="Pixelpress home"><span class="mark" aria-hidden="true"></span>pixelpress</a>
+  <nav aria-label="Primary">
+    <a class="nav-link" href="#how">How it works</a>
+    <button class="icon-btn" id="theme-toggle" type="button" aria-label="Toggle dark mode"><span aria-hidden="true">◐</span></button>
+  </nav>
+</header>
+
+<main>
+  <div class="stage">
+    <div class="glow" aria-hidden="true"></div>
+  <section class="studio" id="studio" aria-label="Image compressor">
+    <div class="studio-top">
+      <span><span class="live" aria-hidden="true"></span>Runs on this device · nothing is uploaded</span>
+      <ul class="pills" aria-label="Highlights"><li>Lossless options</li><li>Free</li></ul>
+    </div>
+
+    <div class="drop" id="drop" role="button" tabindex="0" aria-label="Choose images, drop them here, or paste with Command or Control V">
+      <div class="upload-icon" aria-hidden="true">↑</div>
+      <h1>Compress images privately</h1><span class="drop-more">+ Add more images</span>
+      <p>Drop images here, click to browse<span class="paste-hint">, or paste with <kbd>⌘</kbd><kbd>V</kbd></span></p>
+      <button id="browse" class="btn btn-dark" type="button">Choose images</button>
+      <input hidden id="files" type="file" multiple accept="image/png,image/jpeg,image/webp,image/bmp,image/gif,.png,.jpg,.jpeg,.webp,.bmp,.gif">
+      <small>PNG, JPEG, WebP, BMP &amp; GIF input · 30 MB per file</small>
+    </div>
+
+    <div class="options">
+      <label>Output
+        <select id="format">
+          <option value="original">Original format</option>
+          <option value="webp">PNG → WebP · lossless</option>
+          <option value="png">Convert to PNG</option>
+          <option value="jpeg">Convert to JPEG · lossy</option>
+          <option value="webp-lossy">Convert to WebP · lossy</option>
+        </select>
+      </label>
+      <label>Effort
+        <select id="effort">
+          <option value="balanced">Balanced</option>
+          <option value="maximum">Maximum · slower</option>
+        </select>
+      </label>
+      <label class="check"><input id="comments" type="checkbox"> Remove JPEG comments <span class="tip" title="Only JPEG COM segments are removed. EXIF, orientation, GPS and color profiles are preserved.">ⓘ</span></label>
+    </div>
+
+    <div id="convert-options" class="convert-options" hidden>
+      <label>Quality <input id="quality" type="range" min="1" max="100" value="85"> <output id="quality-value">85%</output></label>
+      <label class="check"><input id="resize" type="checkbox"> Resize image (optional)</label>
+      <label>Max width <input id="max-width" type="number" min="1" max="16383" placeholder="Original"></label>
+      <label>Max height <input id="max-height" type="number" min="1" max="16383" placeholder="Original"></label>
+      <label id="background-label">JPEG background <input type="color" id="background" value="#ffffff"></label>
+      <label class="check"><input id="first-frame" type="checkbox"> Use first frame for GIF / animated images</label>
+      <small id="size-note">Original width, height, and aspect ratio are preserved.</small>
+      <small>Changing settings automatically refreshes all loaded images.</small>
+    </div>
+    <p class="conversion-note" id="conversion-note" hidden>PNG → WebP: pixels and transparency are verified lossless. Metadata is not copied. Some files may be larger. 16-bit, animated, interlaced, and custom-profile PNGs are not supported.</p>
+    <div id="notice" role="status" aria-live="polite"></div>
+
+    <section id="results" hidden>
+      <div class="results-heading"><h2>Your images <span id="count"></span></h2><button id="clear" class="text-button" type="button">Clear finished</button></div>
+      <div id="list"></div>
+      <div class="summary">
+        <div><strong id="saved">0 B saved</strong><small id="total">Everything stays on this device.</small></div>
+        <button id="download" class="btn btn-dark" type="button" disabled>Download all</button>
+      </div>
+    </section>
+  </section>
+  </div>
+
+  <section class="details" id="how" aria-labelledby="how-title">
+    <h2 id="how-title">Built to be trusted.</h2>
+    <div class="cards">
+      <article class="card"><span class="num">01</span><h3>Your files stay yours.</h3><p>No server uploads, accounts, trackers, or external scripts. The compression happens on your device.</p></article>
+      <article class="card"><span class="num">02</span><h3>Same image. Fewer bytes.</h3><p>Original-format compression preserves PNG pixels and metadata. Lossless PNG → WebP preserves pixels and transparency.</p></article>
+      <article class="card"><span class="num">03</span><h3>No magic percentages.</h3><p>Savings vary. JPEG cleanup only removes optional comments. Conversion may increase size. Animation exports require first-frame consent.</p></article>
+    </div>
+  </section>
+
+</main>
+
+<footer class="foot">
+  <a class="brand" href="./"><span class="mark" aria-hidden="true"></span>pixelpress</a>
+  <span>Made for the pixels worth keeping.</span>
+  <span>Local first. Always.</span>
+</footer>
+
+<script>
+document.getElementById('theme-toggle').addEventListener('click',function(){
+  var r=document.documentElement,cur=r.dataset.theme||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'),next=cur==='dark'?'light':'dark';
+  r.dataset.theme=next;try{localStorage.setItem('pp-theme',next)}catch(e){}
+});
+</script>
+<script type="module" src="app.js"></script>
+</body>
+</html>
