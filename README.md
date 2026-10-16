@@ -1,2 +1,77 @@
-# pixel-press
-Private, on-device image compression and conversion for PNG, JPEG, WebP, BMP, and GIF.
+# Pixelpress
+
+A private, browser-based image converter and lossless PNG compressor with a drag-and-drop batch workflow. Designed for GitHub Pages. No installation dependencies or build step, API key, uploads, analytics, or external assets.
+
+## Run locally
+
+From this folder, run:
+
+```sh
+npm start
+```
+
+Open http://localhost:8080. Requires Python 3; Node is only needed for npm commands and tests. Alternatively run `python3 -m http.server 8080 --directory docs` directly. Serve the app over HTTP rather than opening index.html directly because it uses module workers.
+
+## Publish on GitHub Pages
+
+1. Create a GitHub repository and upload this folder's **contents**, keeping `docs` intact.
+2. Open **Settings → Pages** in the repository.
+3. Under **Build and deployment**, choose **Deploy from a branch**.
+4. Select your branch (usually `main`) and the **/docs** folder, then Save.
+5. GitHub will display your website URL after deployment.
+
+All paths are relative, so repository subpath hosting works. The repository includes a test workflow; no hosting account other than GitHub is needed. This project has not been pushed or published automatically.
+
+## Features
+
+- Drag-and-drop batches, individual downloads, and one ZIP download.
+- PNG recompression using reversible PNG row filtering and browser-native DEFLATE.
+- Balanced mode tries existing filters and adaptive filters. Maximum also tries each fixed filter.
+- PNG pixels, alpha, bit depth, palette, color profiles, and metadata are retained.
+- A worker keeps compression off the UI thread; files are processed sequentially.
+- Original-format outputs never exceed original file size. WebP conversion can be larger.
+- Lossless PNG → WebP with bundled @jsquash/webp 1.5.0 / libwebp WebAssembly, no CDN. Each output is decoded and compared byte-for-byte against source RGBA pixels before download.
+- WebP conversion supports non-interlaced grayscale, indexed, RGB, and RGBA PNGs up to 8 bits per channel. Metadata is not copied. Custom profile, orientation, HDR, 16-bit, animated, and interlaced inputs are rejected in conversion mode.
+- Optional JPEG **COM comment removal**, without re-encoding scan data. EXIF (including GPS), orientation, and ICC profiles are retained.
+- 30 MB input limit, 100 MB decoded PNG limit, 50 files per batch.
+
+## What to expect
+
+This is a lossless PNG tool with basic JPEG comment cleanup, **not a replacement for TinyPNG's lossy quantization or CloudConvert's format conversion**. Optimized inputs may save nothing. JPEGs without comments remain unchanged. It converts supported PNG files to lossless WebP. Conversion also accepts JPEG, WebP, BMP, and GIF input when the browser can decode them. AVIF, HEIC, TIFF, SVG, PDF, video, and document conversion are not included. Animated and interlaced PNGs are returned unchanged. Files with unusual trailing PNG data or invalid checksums are rejected.
+
+Lossless means image information is preserved, not that output file bytes are identical. Metadata is preserved; this is not a metadata privacy scrubber. Browser-native DEFLATE will not always match the compression ratios of native optimizers such as oxipng or Zopfli.
+
+Use a current browser supporting CompressionStream, DecompressionStream, and module workers. The app requires serving its local assets, but image processing makes no network requests. For a fully disconnected workflow, download this repository and run the local server. A hosted copy does not provide offline installation/caching.
+
+## Verification
+
+```sh
+npm test
+```
+
+Tests compare decoded byte arrays across grayscale, indexed, RGB, alpha, packed-bit, and 16-bit PNG fixtures; check metadata preservation, size invariants, invalid files, memory limits, and JPEG segment preservation. PNG filtering follows the [W3C PNG specification](https://www.w3.org/TR/png-3/).
+
+## Structure
+
+- `docs/`: complete static application served by GitHub Pages.
+- `docs/engine.js`: compression and input validation.
+- `docs/worker.js`: background compression worker.
+- `tests/`: dependency-free regression tests.
+
+App code is MIT licensed. Bundled jSquash/libwebp files retain their Apache-2.0/BSD notices in `docs/vendor/webp/LICENSE` and `docs/vendor/webp/codec/LICENSE.codec.md`.
+
+## Format conversion controls
+
+Choose an output before adding files:
+
+- **Original format**: lossless PNG recompression or optional JPEG comment cleanup.
+- **PNG → WebP · lossless**: verified exact pixels from supported PNGs.
+- **Convert to PNG**: browser-decoded still-image PNG export.
+- **Convert to JPEG · lossy**: quality 1–100, with a chosen background for transparency.
+- **Convert to WebP · lossy**: quality 1–100 with transparency support.
+
+Conversion accepts PNG, JPEG, WebP, BMP, and GIF. GIF and detected animated PNG/WebP require the first-frame checkbox. Browser decoding support varies. Conversion exports are 8-bit browser-rendered pixels; color profiles and metadata are not copied. This mode is not byte-exact or suitable for preserving 16-bit/HDR originals. JPEG and lossy WebP alter pixels even at quality 100.
+
+Original dimensions are preserved by default. Enable “Resize image (optional)” to set maximum width/height. Resizing fits within bounds, always preserves proportions, and never crops, stretches, or enlarges images. Conversion is limited to 25 megapixels. Changing settings automatically reprocesses all loaded original files after a short pause. Older work is cancelled and stale downloads are removed. No re-upload is needed. CloudConvert-style image controls are included, not CloudConvert's document/video formats.
+
+Downloads preserve original filenames without numbering or suffixes. Conversion changes only the extension. If different inputs produce identical filenames, the ZIP contains duplicate names; extract those individually to avoid overwrite prompts.
