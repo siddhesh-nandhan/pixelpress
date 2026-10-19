@@ -1,6 +1,6 @@
-# Pixelpress
+# Shrinkwrap
 
-A private, browser-based image converter and lossless PNG compressor with a drag-and-drop batch workflow. Designed for GitHub Pages. No installation dependencies or build step, API key, uploads, analytics, or external assets.
+Shrinkwrap makes images, GLB 3D models and audio files smaller without uploading them. Everything runs in the browser, with drag-and-drop batches and a ZIP download. Designed for GitHub Pages. No build step, API key, uploads, analytics, or external assets: every library is bundled in `docs/vendor`.
 
 ## Run locally
 
@@ -23,6 +23,11 @@ Open http://localhost:8080. Requires Python 3; Node is only needed for npm comma
 All paths are relative, so repository subpath hosting works. The repository includes a test workflow; no hosting account other than GitHub is needed. This project has not been pushed or published automatically.
 
 ## Features
+
+- **Images:** PNG, JPEG, WebP, BMP and GIF input; lossless recompression or conversion to WebP, PNG and JPEG.
+- **3D models:** `.glb` files get meshopt geometry compression, de-duplication, and texture downscaling / WebP re-encoding. Output uses `EXT_meshopt_compression` and `EXT_texture_webp`, so three.js, Babylon.js and model-viewer read it. Older viewers may not. Models that already use Draco keep Draco for the mesh and get smaller textures.
+- **Audio:** almost any input (MP3, WAV, FLAC, AAC, M4A, OGG, Opus, AIFF, WMA…) to MP3, AAC, Opus or lossless FLAC, with bitrate and mono options, powered by ffmpeg.wasm. The ~30 MB engine loads only the first time audio is used. Opus is limited to complexity 4 because higher levels crash this wasm build on stereo input.
+- Licences: ffmpeg-core is GPL-2.0-or-later (see `docs/vendor/ffmpeg-core/NOTICE.md`); the rest is MIT/Apache-2.0.
 
 - Drag-and-drop batches, individual downloads, and one ZIP download.
 - PNG recompression using reversible PNG row filtering and browser-native DEFLATE.

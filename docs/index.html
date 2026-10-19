@@ -3,25 +3,25 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Pixelpress — Compress images privately</title>
-<meta name="description" content="Private, on-device image compression and conversion for PNG, JPEG, WebP, BMP and GIF. No uploads, no accounts.">
+<title>Shrinkwrap: compress images, 3D models and audio</title>
+<meta name="description" content="Shrink PNG, JPEG, WebP, GLB 3D models and audio files in your browser. Your files are never uploaded, and it's free to use.">
 <meta name="theme-color" content="#f7f4ed" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#151514" media="(prefers-color-scheme: dark)">
-<meta property="og:title" content="Pixelpress — Compress images privately">
-<meta property="og:description" content="Compress or convert images right in your browser. Nothing leaves your device.">
+<meta property="og:title" content="Shrinkwrap: compress images, 3D models and audio">
+<meta property="og:description" content="Make files smaller without uploading them. Images, GLB 3D models and audio, all compressed on your device.">
 <meta property="og:type" content="website">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23ff8a3d'/%3E%3Cstop offset='.55' stop-color='%23ff4f8b'/%3E%3Cstop offset='1' stop-color='%236b7bff'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='32' height='32' rx='9' fill='url(%23g)'/%3E%3Crect x='9' y='9' width='14' height='14' rx='3' fill='%23fcfbf8'/%3E%3C/svg%3E">
 <script>try{var t=localStorage.getItem('pp-theme');if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"Pixelpress","applicationCategory":"MultimediaApplication","operatingSystem":"Any","offers":{"@type":"Offer","price":"0"},"description":"Private, on-device image compression and conversion."}</script>
-<link rel="stylesheet" href="style.css">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"Shrinkwrap","applicationCategory":"MultimediaApplication","operatingSystem":"Any","offers":{"@type":"Offer","price":"0"},"description":"Compress images, GLB 3D models and audio on your own device."}</script>
+<link rel="stylesheet" href="style.css?v=5">
 </head>
 <body>
 <a class="skip" href="#studio">Skip to the compressor</a>
 
 <header class="nav">
-  <a class="brand" href="./" aria-label="Pixelpress home"><span class="mark" aria-hidden="true"></span>pixelpress</a>
+  <a class="brand" href="./" aria-label="Shrinkwrap home"><span class="mark" aria-hidden="true"></span>shrinkwrap</a>
   <nav aria-label="Primary">
-    <a class="nav-link" href="#how">How it works</a>
+    <a class="nav-link" href="#how">Privacy</a>
     <button class="icon-btn" id="theme-toggle" type="button" aria-label="Toggle dark mode"><span aria-hidden="true">◐</span></button>
   </nav>
 </header>
@@ -31,38 +31,55 @@
     <div class="glow" aria-hidden="true"></div>
   <section class="studio" id="studio" aria-label="Image compressor">
     <div class="studio-top">
-      <span><span class="live" aria-hidden="true"></span>Runs on this device · nothing is uploaded</span>
-      <ul class="pills" aria-label="Highlights"><li>Lossless options</li><li>Free</li></ul>
+      <span>Compression runs on this device</span>
     </div>
 
-    <div class="drop" id="drop" role="button" tabindex="0" aria-label="Choose images, drop them here, or paste with Command or Control V">
+
+    <div class="kinds" role="tablist" aria-label="File type">
+      <button class="kind" role="tab" id="tab-image" data-kind="image" aria-selected="true" aria-controls="panel-image" type="button">Images</button>
+      <button class="kind" role="tab" id="tab-glb" data-kind="glb" aria-selected="false" aria-controls="panel-glb" tabindex="-1" type="button">3D models</button>
+      <button class="kind" role="tab" id="tab-audio" data-kind="audio" aria-selected="false" aria-controls="panel-audio" tabindex="-1" type="button">Audio</button>
+    </div>
+
+    <div class="drop" id="drop" role="button" tabindex="0" aria-label="Choose files, drop them here, or paste with Command or Control V">
       <div class="upload-icon" aria-hidden="true">↑</div>
-      <h1>Compress images privately</h1><span class="drop-more">+ Add more images</span>
-      <p>Drop images here, click to browse<span class="paste-hint">, or paste with <kbd>⌘</kbd><kbd>V</kbd></span></p>
-      <button id="browse" class="btn btn-dark" type="button">Choose images</button>
+      <h1>Make files smaller without uploading them</h1><span class="drop-more">+ Add more files</span>
+      <p><span id="drop-verb">Drop images here</span>, click to browse<span class="paste-hint">, or paste with <kbd>⌘</kbd><kbd>V</kbd></span></p>
+      <button id="browse" class="btn btn-dark" type="button">Choose files</button>
       <input hidden id="files" type="file" multiple accept="image/png,image/jpeg,image/webp,image/bmp,image/gif,.png,.jpg,.jpeg,.webp,.bmp,.gif">
-      <small>PNG, JPEG, WebP, BMP &amp; GIF input · 30 MB per file</small>
+      <small id="drop-formats">PNG, JPEG, WebP, BMP &amp; GIF input · 30 MB per file</small>
     </div>
 
-    <div class="options">
-      <label>Output
-        <select id="format">
-          <option value="original">Original format</option>
-          <option value="webp">PNG → WebP · lossless</option>
-          <option value="png">Convert to PNG</option>
-          <option value="jpeg">Convert to JPEG · lossy</option>
-          <option value="webp-lossy">Convert to WebP · lossy</option>
-        </select>
-      </label>
-      <label>Effort
-        <select id="effort">
-          <option value="balanced">Balanced</option>
-          <option value="maximum">Maximum · slower</option>
-        </select>
-      </label>
-      <label class="check"><input id="comments" type="checkbox"> Remove JPEG comments <span class="tip" title="Only JPEG COM segments are removed. EXIF, orientation, GPS and color profiles are preserved.">ⓘ</span></label>
-    </div>
+    <section class="kind-panel" id="panel-image" role="tabpanel" aria-labelledby="tab-image" data-kind="image">
+    <fieldset class="goals" id="goals">
+      <legend>What do you need?</legend>
+      <label class="goal"><input type="radio" name="goal" value="original" checked><span><strong>Same image, smaller</strong><small>Lossless, keeps format and metadata</small></span></label>
+      <label class="goal"><input type="radio" name="goal" value="web"><span><strong>Smallest for the web</strong><small>WebP at quality 80, for websites</small></span></label>
+      <label class="goal"><input type="radio" name="goal" value="jpeg"><span><strong>Works everywhere</strong><small>JPEG, opens in any app</small></span></label>
+      <label class="goal"><input type="radio" name="goal" value="png"><span><strong>Keep transparency</strong><small>PNG, every pixel unchanged</small></span></label>
+    </fieldset>
 
+    <details class="advanced">
+      <summary>Advanced</summary>
+      <div>
+        <div class="options">
+          <label>Format
+            <select id="format">
+              <option value="original">Keep original format</option>
+              <option value="webp">WebP · lossless</option>
+              <option value="webp-lossy">WebP · lossy</option>
+              <option value="png">PNG</option>
+              <option value="jpeg">JPEG</option>
+            </select>
+          </label>
+          <label>Effort
+            <select id="effort">
+              <option value="balanced">Standard</option>
+              <option value="maximum">Best · slower</option>
+            </select>
+          </label>
+          <label class="check"><input id="comments" type="checkbox"> Remove JPEG comments <span class="tip" title="Only JPEG COM segments are removed. EXIF, orientation, GPS and color profiles are preserved.">ⓘ</span></label>
+        </div>
     <div id="convert-options" class="convert-options" hidden>
       <label>Quality <input id="quality" type="range" min="1" max="100" value="85"> <output id="quality-value">85%</output></label>
       <label class="check"><input id="resize" type="checkbox"> Resize image (optional)</label>
@@ -73,7 +90,50 @@
       <small id="size-note">Original width, height, and aspect ratio are preserved.</small>
       <small>Changing settings automatically refreshes all loaded images.</small>
     </div>
+      </div>
+    </details>
     <p class="conversion-note" id="conversion-note" hidden>PNG → WebP: pixels and transparency are verified lossless. Metadata is not copied. Some files may be larger. 16-bit, animated, interlaced, and custom-profile PNGs are not supported.</p>
+    </section>
+    <section class="kind-panel" id="panel-glb" role="tabpanel" aria-labelledby="tab-glb" data-kind="glb" hidden>
+      <fieldset class="goals">
+        <legend>What do you need?</legend>
+        <label class="goal"><input type="radio" name="goal-glb" value="web" checked><span><strong>Web-ready</strong><small>Textures up to 2048 px, compressed mesh</small></span></label>
+        <label class="goal"><input type="radio" name="goal-glb" value="small"><span><strong>Smallest file</strong><small>Textures up to 1024 px, strongest mesh compression</small></span></label>
+        <label class="goal"><input type="radio" name="goal-glb" value="quality"><span><strong>High quality</strong><small>Textures up to 4096 px, higher quality</small></span></label>
+        <label class="goal"><input type="radio" name="goal-glb" value="mesh"><span><strong>Geometry only</strong><small>Compress the mesh, leave textures alone</small></span></label>
+      </fieldset>
+      <details class="advanced">
+        <summary>Advanced</summary>
+        <div>
+          <div class="options">
+            <label>Mesh <select id="glb-mesh"><option value="balanced">Standard compression</option><option value="max">Maximum compression</option><option value="none">None</option></select></label>
+            <label>Texture size <select id="glb-tex"><option value="4096">Up to 4096 px</option><option value="2048" selected>Up to 2048 px</option><option value="1024">Up to 1024 px</option><option value="512">Up to 512 px</option><option value="0">Keep as is</option></select></label>
+            <label>Texture quality <input id="glb-quality" type="range" min="40" max="100" value="80"> <output id="glb-quality-value">80%</output></label>
+          </div>
+          <small class="hint">The result is a standard .glb. Meshes use meshopt (models that already use Draco keep Draco) and textures become WebP. three.js, Babylon.js and model-viewer read both; older viewers may not.</small>
+        </div>
+      </details>
+    </section>
+    <section class="kind-panel" id="panel-audio" role="tabpanel" aria-labelledby="tab-audio" data-kind="audio" hidden>
+      <fieldset class="goals">
+        <legend>What do you need?</legend>
+        <label class="goal"><input type="radio" name="goal-audio" value="everywhere" checked><span><strong>Works everywhere</strong><small>MP3 at 128 kbps, plays on anything</small></span></label>
+        <label class="goal"><input type="radio" name="goal-audio" value="smallest"><span><strong>Smallest file</strong><small>Opus at 64 kbps, good for voice</small></span></label>
+        <label class="goal"><input type="radio" name="goal-audio" value="quality"><span><strong>High quality</strong><small>AAC at 192 kbps, works well on Apple devices</small></span></label>
+        <label class="goal"><input type="radio" name="goal-audio" value="lossless"><span><strong>Lossless</strong><small>FLAC, identical sound at a smaller size than WAV</small></span></label>
+      </fieldset>
+      <details class="advanced">
+        <summary>Advanced</summary>
+        <div>
+          <div class="options">
+            <label>Format <select id="audio-format"><option value="mp3">MP3</option><option value="aac">AAC (.m4a)</option><option value="opus">Opus</option><option value="flac">FLAC · lossless</option></select></label>
+            <label>Bitrate <select id="audio-bitrate"><option value="320">320 kbps</option><option value="256">256 kbps</option><option value="192">192 kbps</option><option value="160">160 kbps</option><option value="128" selected>128 kbps</option><option value="96">96 kbps</option><option value="64">64 kbps</option><option value="48">48 kbps</option><option value="32">32 kbps</option></select></label>
+            <label class="check"><input id="audio-mono" type="checkbox"> Mono <span class="tip" title="Mixes left and right into one channel. Roughly halves the size; good for speech and podcasts.">ⓘ</span></label>
+          </div>
+          <small class="hint">Reads MP3, WAV, FLAC, AAC, M4A, OGG, Opus, AIFF, WMA and more. Tags are kept and embedded cover art is removed. The first audio file downloads a 30 MB engine, once.</small>
+        </div>
+      </details>
+    </section>
     <div id="notice" role="status" aria-live="polite"></div>
 
     <section id="results" hidden>
@@ -88,20 +148,20 @@
   </div>
 
   <section class="details" id="how" aria-labelledby="how-title">
-    <h2 id="how-title">Built to be trusted.</h2>
+    <h2 id="how-title">What happens to your files</h2>
     <div class="cards">
-      <article class="card"><span class="num">01</span><h3>Your files stay yours.</h3><p>No server uploads, accounts, trackers, or external scripts. The compression happens on your device.</p></article>
-      <article class="card"><span class="num">02</span><h3>Same image. Fewer bytes.</h3><p>Original-format compression preserves PNG pixels and metadata. Lossless PNG → WebP preserves pixels and transparency.</p></article>
-      <article class="card"><span class="num">03</span><h3>No magic percentages.</h3><p>Savings vary. JPEG cleanup only removes optional comments. Conversion may increase size. Animation exports require first-frame consent.</p></article>
+      <article class="card"><span class="num">01</span><h3>They stay on your device.</h3><p>Compression runs in your browser, so nothing is uploaded. The site hosts everything it needs itself and loads no third-party scripts or trackers.</p></article>
+      <article class="card"><span class="num">02</span><h3>Lossless wherever possible.</h3><p>PNG recompression keeps every pixel, and lossless WebP results are decoded and compared with the original before you see them. Lossy options (JPEG, lossy WebP, MP3, AAC, Opus) are labelled as lossy.</p></article>
+      <article class="card"><span class="num">03</span><h3>Savings depend on the file.</h3><p>Screenshots, graphics, WAV audio and uncompressed 3D models shrink the most. Photos and MP3s are already compressed, so they shrink less. Each row shows the size before and after.</p></article>
     </div>
   </section>
 
 </main>
 
 <footer class="foot">
-  <a class="brand" href="./"><span class="mark" aria-hidden="true"></span>pixelpress</a>
-  <span>Made for the pixels worth keeping.</span>
-  <span>Local first. Always.</span>
+  <a class="brand" href="./"><span class="mark" aria-hidden="true"></span>shrinkwrap</a>
+  <span>Free to use</span>
+  <span>Runs on your device</span>
 </footer>
 
 <script>
@@ -110,6 +170,6 @@ document.getElementById('theme-toggle').addEventListener('click',function(){
   r.dataset.theme=next;try{localStorage.setItem('pp-theme',next)}catch(e){}
 });
 </script>
-<script type="module" src="app.js"></script>
+<script type="module" src="app.js?v=5"></script>
 </body>
 </html>
